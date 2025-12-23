@@ -8,7 +8,7 @@ fn vips_path(app: &AppHandle) -> Result<std::path::PathBuf, String> {
     let subpath = if cfg!(target_os = "windows") {
         "resources/bin/windows/bin/vips.exe"
     } else if cfg!(target_os = "macos") {
-        "resources/bin/macos/vips"
+        "resources/bin/macos/bin/vips"
     } else {
         "resources/bin/windows/bin/vips.exe"
     };
@@ -18,17 +18,19 @@ fn vips_path(app: &AppHandle) -> Result<std::path::PathBuf, String> {
         .map_err(|e| e.to_string())
 }
 
-#[tauri::command]
-fn convert_image_2(str_path: String, img_format: String) {
-    let path = Path::new(&str_path);
-    let dir = path.parent().unwrap();
-    let img = ImageReader::open(&str_path).unwrap().decode().unwrap();
-    let _ = img.save(dir.join(Path::new(&(
-        path.file_stem().unwrap().to_string_lossy().to_string()
-            + &'.'.to_string()
-            + &img_format.to_string())
-    )));
-}
+
+// uses crate [image = "0.25.9"]
+// #[tauri::command]
+// fn convert_image_2(str_path: String, img_format: String) {
+//     let path = Path::new(&str_path);
+//     let dir = path.parent().unwrap();
+//     let img = ImageReader::open(&str_path).unwrap().decode().unwrap();
+//     let _ = img.save(dir.join(Path::new(&(
+//         path.file_stem().unwrap().to_string_lossy().to_string()
+//             + &'.'.to_string()
+//             + &img_format.to_string())
+//     )));
+// }
 
 #[tauri::command]
 fn convert_image(app: AppHandle, str_path: String, img_format: String) {
