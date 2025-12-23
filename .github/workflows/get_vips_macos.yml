@@ -1,0 +1,36 @@
+name: Build macOS libvips bundle
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-macos-vips:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install libvips
+        run: brew install vips
+
+      - name: Prepare output directory
+        run: mkdir -p out/bin out/lib
+
+      - name: Copy vips binary
+        run: |
+          VIPS_PREFIX=$(brew --prefix vips)
+          cp "$VIPS_PREFIX/bin/vips" out/bin/
+
+      - name: Copy dylibs
+        run: |
+          VIPS_PREFIX=$(brew --prefix vips)
+          cp "$VIPS_PREFIX/lib/"*.dylib out/lib/
+
+      - name: Upload libvips bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: libvips-macos
+          path: out

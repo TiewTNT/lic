@@ -1,0 +1,49 @@
+<script lang="ts">
+  import { invoke } from "@tauri-apps/api/core";
+  import { open } from "@tauri-apps/plugin-dialog";
+   
+  let images: Set<string> = $state(new Set([]));
+  $inspect(images)
+
+  let imgFormat = $state('png')
+</script>
+
+
+{#each images as image}
+<p>{image}</p>
+{/each}
+
+<button
+  onclick={async () => {
+    images = images.union(new Set(await open({
+      multiple: true,
+      directory: false,
+      filters: [
+    {
+      name: 'Images',
+      extensions: ['png', 'jpg', 'jpeg', 'webp', 'avif', 'gif'],
+    },
+  ],
+    })));
+  }}>d</button
+>
+
+<button
+  onclick={async () => {
+    images = new Set();
+  }}>c</button
+>
+
+<button
+  onclick={async () => {
+    await invoke("convert_images", { strPaths: Array.from(images), imgFormat: imgFormat })
+  }}>x</button
+>
+
+
+<select bind:value={imgFormat}>
+  <option value="png">PNG</option>
+  <option value="jpg">JPG</option>
+  <option value="gif">GIF</option>
+</select>
+
