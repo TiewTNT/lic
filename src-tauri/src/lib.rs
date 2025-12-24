@@ -4,6 +4,7 @@ use std::io::Error;
 use std::path::Path;
 use std::process::Command;
 use std::process::ExitStatus;
+use std::time::{SystemTime, UNIX_EPOCH};
 use tauri::path::BaseDirectory;
 use tauri::{AppHandle, Manager};
 
@@ -39,9 +40,8 @@ fn convert_image(app: AppHandle, str_path: String, img_format: String, dpi: Opti
     let path = Path::new(&str_path);
     let dir = path.parent().unwrap();
 
-    let binding = dir.join(Path::new(
+    let mut binding = dir.join(Path::new(
         &(path.file_stem().unwrap().to_string_lossy().to_string()
-            + &"_%d".to_string()
             + &'.'.to_string()
             + &img_format.to_string()),
     ));
@@ -52,19 +52,80 @@ fn convert_image(app: AppHandle, str_path: String, img_format: String, dpi: Opti
         "{:?}",
         vips_path(&app).unwrap().to_string_lossy().to_string()
     );
-    let cmd_status = Command::new(vips_path(&app).unwrap().to_string_lossy().to_string())
-        .args([
-            match path.extension().unwrap_or_else(|| OsStr::new(".png")).to_str().unwrap_or_else(|| ".png") {
-                "pdf" => "pdfload",
-                _ => "copy"
-            },
-            &(str_path + "[dpi=" + dpi.unwrap_or_else(|| 700).to_string().as_str() + ",n=-1]")
-                .as_str(),
-            output_path.to_string().as_str(),
-        ])
-        .status();
 
-    println!("{:?}", cmd_status);
+    match path
+        .extension()
+        .unwrap_or_else(|| OsStr::new(".png"))
+        .to_str()
+        .unwrap_or_else(|| ".png")
+    {
+        "pdf" => {
+            let mut page: usize = 0;
+
+            loop {
+                let output = {
+                    let mut name = binding
+                        .file_stem()
+                        .unwrap_or_else(|| OsStr::new("output"))
+                        .to_os_string();
+                    name.push(format!("_{:03}", page));
+                    name.push(".");
+                    name.push(binding.extension().unwrap_or_else(|| OsStr::new("png")));
+                    binding.with_file_name(name)
+                };
+
+                let input_spec = format!("{}[page={},dpi={}]", str_path, page, dpi.unwrap_or(300));
+
+                let status = Command::new(vips_path(&app).unwrap())
+                    .args([
+                        "copy",
+                        input_spec.as_str(),
+                        output.to_string_lossy().as_ref(),
+                    ])
+                    .status();
+
+                match status {
+                    Ok(s) if s.success() => {
+                        page += 1;
+                    }
+                    _ => {
+                        // page out of range → we're done
+                        break;
+                    }
+                }
+            }
+        }
+        "svg" => {
+            println!("{}", dpi.unwrap_or_else(|| 300));
+            let output = {
+                    let mut name = binding
+                        .file_stem()
+                        .unwrap_or_else(|| OsStr::new("output"))
+                        .to_os_string();
+                    name.push(".");
+                    name.push(binding.extension().unwrap_or_else(|| OsStr::new("png")));
+                    binding.with_file_name(name)
+                };
+
+
+                let status = Command::new(vips_path(&app).unwrap())
+                    .args([
+                        "copy",
+                        (str_path + format!("[dpi={}]", dpi.unwrap_or_else(|| 300).to_string()).as_ref()).as_ref(),
+                        output.to_string_lossy().as_ref(),
+                        
+                    ])
+                    .status();
+                println!("{:?}", status)
+        }
+        _ => {
+            println!("{:?}", Command::new(vips_path(&app).unwrap().to_string_lossy().to_string())
+                .args(["copy", str_path.as_ref(), output_path.as_ref()])
+                .status());
+        }
+    };
+
+
 }
 
 #[tauri::command]
