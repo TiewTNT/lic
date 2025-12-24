@@ -1,6 +1,7 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
   import { open } from "@tauri-apps/plugin-dialog";
+  import { X } from "@lucide/svelte";
    
   let images: Set<string> = $state(new Set([]));
   $inspect(images)
@@ -10,7 +11,10 @@
 
 
 {#each images as image}
-<p>{image}</p>
+<div>
+<span>{image}</span>
+<button><X /></button>
+</div>
 {/each}
 
 <button
@@ -21,7 +25,7 @@
       filters: [
     {
       name: 'Images',
-      extensions: ['png', 'jpg', 'jpeg', 'webp', 'avif', 'gif'],
+      extensions: ['png', 'jpg', 'jpeg', 'webp', 'avif', 'gif', 'pdf'],
     },
   ],
     })));

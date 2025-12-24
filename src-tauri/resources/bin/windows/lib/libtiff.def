@@ -112,6 +112,7 @@ TIFFInitSGILog
 TIFFInitThunderScan
 TIFFInitWebP
 TIFFInitZIP
+TIFFInitZSTD
 TIFFIsBigEndian
 TIFFIsBigTIFF
 TIFFIsByteSwapped

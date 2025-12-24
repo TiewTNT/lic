@@ -1,6 +1,9 @@
-use image::ImageReader;
+use std::ffi::OsStr;
+// use image::ImageReader;
+use std::io::Error;
 use std::path::Path;
 use std::process::Command;
+use std::process::ExitStatus;
 use tauri::path::BaseDirectory;
 use tauri::{AppHandle, Manager};
 
@@ -18,7 +21,6 @@ fn vips_path(app: &AppHandle) -> Result<std::path::PathBuf, String> {
         .map_err(|e| e.to_string())
 }
 
-
 // uses crate [image = "0.25.9"]
 // #[tauri::command]
 // fn convert_image_2(str_path: String, img_format: String) {
@@ -33,33 +35,42 @@ fn vips_path(app: &AppHandle) -> Result<std::path::PathBuf, String> {
 // }
 
 #[tauri::command]
-fn convert_image(app: AppHandle, str_path: String, img_format: String) {
+fn convert_image(app: AppHandle, str_path: String, img_format: String, dpi: Option<i32>) {
     let path = Path::new(&str_path);
     let dir = path.parent().unwrap();
-    let binding = dir.join(Path::new(&(
-        path.file_stem().unwrap().to_string_lossy().to_string()
+
+    let binding = dir.join(Path::new(
+        &(path.file_stem().unwrap().to_string_lossy().to_string()
+            + &"_%d".to_string()
             + &'.'.to_string()
-            + &img_format.to_string())
+            + &img_format.to_string()),
     ));
     let output_path = binding.to_string_lossy();
-
     println!("{:?}", path);
     println!("{:?}", output_path);
     println!(
         "{:?}",
         vips_path(&app).unwrap().to_string_lossy().to_string()
     );
-
     let cmd_status = Command::new(vips_path(&app).unwrap().to_string_lossy().to_string())
-        .args(["copy", str_path.as_str(), output_path.to_string().as_str()])
+        .args([
+            match path.extension().unwrap_or_else(|| OsStr::new(".png")).to_str().unwrap_or_else(|| ".png") {
+                "pdf" => "pdfload",
+                _ => "copy"
+            },
+            &(str_path + "[dpi=" + dpi.unwrap_or_else(|| 700).to_string().as_str() + ",n=-1]")
+                .as_str(),
+            output_path.to_string().as_str(),
+        ])
         .status();
-    println!("{:?}", cmd_status)
+
+    println!("{:?}", cmd_status);
 }
 
 #[tauri::command]
-fn convert_images(app: AppHandle, str_paths: Vec<String>, img_format: String) {
+fn convert_images(app: AppHandle, str_paths: Vec<String>, img_format: String, dpi: Option<i32>) {
     for str_path in str_paths {
-        convert_image(app.clone(), str_path, img_format.clone());
+        convert_image(app.clone(), str_path, img_format.clone(), dpi);
     }
 }
 
