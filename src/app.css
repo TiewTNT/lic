@@ -211,8 +211,7 @@
 
 .titlebar {
   user-select: none;
-  display: grid;
-  grid-template-columns: auto max-content;
+  display: inline-flex;
   position: fixed;
   top: 0;
   left: 0;
