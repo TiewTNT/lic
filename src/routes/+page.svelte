@@ -5,6 +5,9 @@
   import { flip } from "svelte/animate";
   import { slide } from "svelte/transition";
   import { openPath } from '@tauri-apps/plugin-opener';
+  import { getCurrentWebview } from '@tauri-apps/api/webview';
+    import { onDestroy, onMount } from "svelte";
+    import type { UnlistenFn } from "@tauri-apps/api/event";
 
   let imagesRecord: Record<string, boolean | null> = $state({});
   $inspect(imagesRecord);
@@ -12,6 +15,48 @@
   let imgFormat = $state("png");
 
   let dpi = $state(300);
+
+  let inputFmtArr = [
+                  "png",
+                  "jpg",
+                  "jpeg",
+                  "webp",
+                  "avif",
+                  "gif",
+                  "pdf",
+                  "svg",
+                ]
+
+  let unlisten: UnlistenFn
+  onMount(async () => {
+    unlisten = await getCurrentWebview().onDragDropEvent(event => {
+  const type  = event.payload.type;
+  if (type === 'drop') {
+    console.log('File paths:', event.payload.paths);
+    const next = { ...imagesRecord };
+    for (let path of event.payload.paths) {
+      if (inputFmtArr.includes(path.split('.').at(-1)?.toLowerCase() ?? "")) {
+        next[path] = next[path] ?? null;
+      } else {
+        console.error(path)
+      }
+    }
+    imagesRecord = next
+  } else if (type === 'over') {
+    //console.log('Hovering files');
+  } else if (type === 'leave') {
+    //console.log('Drag cancelled');
+  }
+});
+
+
+  })
+
+  onDestroy(() => {
+    unlisten()
+  })
+
+
 </script>
 
 <div class="p-10">
@@ -33,12 +78,15 @@
       >
         <button
           class="text-white/50 truncate rtl text-lefttruncate overflow-hidden whitespace-nowrap text-left [direction:rtl]"
-        onclick={async () => await openPath(image.split(/\/|\\/).slice(0, -1).join("/"))}
-          >
+          onclick={async () =>
+            await openPath(image.split(/\/|\\/).slice(0, -1).join("/"))}
+        >
           <span>
             {image.split(/\/|\\/).slice(0, -1).join("/") ?? ""}/
           </span>
-          <strong class="dark:text-surface-contrast-900 text-surface-contrast-50">
+          <strong
+            class="dark:text-surface-contrast-900 text-surface-contrast-50"
+          >
             {image.split(/\/|\\/).at(-1) ?? ""}
           </strong>
         </button>
@@ -66,10 +114,6 @@
     })().join(", ")}
   </div>
 
-  {#if Object.keys(imagesRecord).length}
-    <div class="h-40"></div>
-  {/if}
-
   <div
     class="fixed bottom-10 left-1/2 -translate-x-1/2
     inline-flex gap-5 border rounded-3xl border-[#ffffff30]
@@ -85,16 +129,7 @@
             filters: [
               {
                 name: "Images",
-                extensions: [
-                  "png",
-                  "jpg",
-                  "jpeg",
-                  "webp",
-                  "avif",
-                  "gif",
-                  "pdf",
-                  "svg",
-                ],
+                extensions: inputFmtArr,
               },
             ],
           });
@@ -136,11 +171,15 @@
       <div
         class="flex border-[#80808030] border dark:bg-surface-900 rounded-2xl px-4 w-25 align-middle"
       >
-        <select bind:value={imgFormat} class="select ring-0 focus:outline-0" onchange={() => {
-          for (let k in imagesRecord) {
-            imagesRecord[k] = null
-          }
-        }}>
+        <select
+          bind:value={imgFormat}
+          class="select ring-0 focus:outline-0"
+          onchange={() => {
+            for (let k in imagesRecord) {
+              imagesRecord[k] = null;
+            }
+          }}
+        >
           <option value="png">PNG</option>
           <option value="jpg">JPG</option>
           <option value="gif">GIF</option>

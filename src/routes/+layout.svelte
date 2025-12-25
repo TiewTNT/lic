@@ -14,7 +14,7 @@
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <!-- svelte-ignore a11y_mouse_events_have_key_events -->
     <div
-        class="m-1 size-8 mr-auto active:scale-95 transition-all"
+        class="m-1 size-8 mr-auto active:scale-90 active:rotate-360 transition-all"
         onmousedown={() => {
             const staticIcon = document.getElementById("appIcon");
             const animIcon = document.getElementById("appIconAnim");

@@ -2,11 +2,15 @@ use std::ffi::OsStr;
 
 use std::path::Path;
 use std::process::Command;
+use std::process::Stdio;
 
 use tauri::path::BaseDirectory;
 use tauri::{AppHandle, Manager};
 
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
+
+#[cfg(windows)]
+use std::os::windows::process::CommandExt;
 
 fn vips_path(app: &AppHandle) -> Result<std::path::PathBuf, String> {
     let subpath = if cfg!(target_os = "windows") {
@@ -20,6 +24,23 @@ fn vips_path(app: &AppHandle) -> Result<std::path::PathBuf, String> {
     app.path()
         .resolve(subpath, BaseDirectory::Resource)
         .map_err(|e| e.to_string())
+}
+
+#[cfg(windows)]
+const CREATE_NO_WINDOW: u32 = 0x08000000;
+
+fn vips_command(app: &AppHandle) -> Command {
+    let mut cmd = Command::new(vips_path(app).unwrap());
+
+    #[cfg(windows)]
+    {
+        cmd.creation_flags(CREATE_NO_WINDOW);
+    }
+
+    cmd.stdout(Stdio::null())
+       .stderr(Stdio::null());
+
+    cmd
 }
 
 // uses crate [image = "0.25.9"]
@@ -87,7 +108,7 @@ fn convert_image(app: AppHandle, str_path: String, img_format: String, dpi: Opti
                             };
 
                     }
-                    let status = Command::new(vips_path(&app).unwrap())
+                    let status = vips_command(&app)
                         .args([
                             "copy",
                             input_spec.as_str(),
@@ -133,7 +154,7 @@ fn convert_image(app: AppHandle, str_path: String, img_format: String, dpi: Opti
                     };
                 }
 
-                let status = Command::new(vips_path(&app).unwrap())
+                let status = vips_command(&app)
                     .args([
                         "copy",
                         (str_path
@@ -163,7 +184,7 @@ fn convert_image(app: AppHandle, str_path: String, img_format: String, dpi: Opti
                     };
                 }
 
-                let status = Command::new(vips_path(&app).unwrap().to_string_lossy().to_string())
+                let status = vips_command(&app)
                     .args(["copy", str_path.as_ref(), output_path.as_ref()])
                     .status();
 
