@@ -1,75 +1,172 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
   import { open } from "@tauri-apps/plugin-dialog";
-  import { X } from "@lucide/svelte";
+  import { X, Plus, Trash, Repeat } from "@lucide/svelte";
+  import { flip } from "svelte/animate";
+  import { slide } from "svelte/transition";
 
-  let images: Set<string> = $state(new Set([]));
-  $inspect(images);
+  let imagesRecord: Record<string, boolean | null> = $state({});
+  $inspect(imagesRecord);
 
   let imgFormat = $state("png");
 
-  let dpi = $state(300)
+  let dpi = $state(300);
 </script>
 
-{#each images as image}
-  <div>
-    <span>{image}</span>
-    <button onclick={() => images.delete(image)}><X /></button>
+<div class="p-10">
+  <div class="pathList">
+    {#each Object.entries(imagesRecord) as [image, status], index (image)}
+      <div
+        class={(() => {
+          switch (status) {
+            case true:
+              return "inline-flex gap-5 p-4 dark:bg-success-900/30 bg-success-200 border border-b-0 border-[#80808030] w-full";
+            case false:
+              return "inline-flex gap-5 p-4 dark:bg-error-900/30 bg-error-200 border border-b-0 border-[#80808030] w-full";
+            default:
+              return "inline-flex gap-5 p-4 dark:bg-surface-900 border border-b-0 border-[#80808030] w-full";
+          }
+        })()}
+        transition:slide={{ duration: 200 }}
+        animate:flip={{ duration: 200 }}
+      >
+        <span
+          class="text-white/50 truncate rtl text-lefttruncate overflow-hidden whitespace-nowrap text-left [direction:rtl]"
+        >
+          <span>
+            {image.split(/\/|\\/).slice(0, -1).join("/") ?? ""}/
+          </span>
+          <strong class="dark:text-surface-contrast-900 text-surface-contrast-50">
+            {image.split(/\/|\\/).at(-1) ?? ""}
+          </strong>
+        </span>
+        <button
+          class="ml-auto"
+          onclick={() => {
+            const next = { ...imagesRecord };
+            delete next[image];
+            imagesRecord = next;
+          }}
+        >
+          <X />
+        </button>
+      </div>
+    {/each}
   </div>
-{/each}
+  <div class="m-2 w-full text-white/50 text-center text-sm">
+    {#if Object.keys(imagesRecord).length}Selected files has format{#if Object.keys(imagesRecord).length > 1}s{/if}{/if}
+    {(() => {
+      let extSet = new Set();
+      for (let img of Object.keys(imagesRecord)) {
+        extSet.add(img.split(".").at(-1)?.toUpperCase());
+      }
+      return Array.from(extSet);
+    })().join(", ")}
+  </div>
 
-<button
-  onclick={async () => {
-    images = images.union(
-      new Set(
-        await open({
-          multiple: true,
-          directory: false,
-          filters: [
-            {
-              name: "Images",
-              extensions: [
-                "png",
-                "jpg",
-                "jpeg",
-                "webp",
-                "avif",
-                "gif",
-                "pdf",
-                "svg",
-              ],
-            },
-          ],
-        }),
-      ),
-    );
-  }}>d</button
->
+  {#if Object.keys(imagesRecord).length}
+    <div class="h-40"></div>
+  {/if}
 
-<button
-  onclick={async () => {
-    images = new Set();
-  }}>c</button
->
+  <div
+    class="fixed bottom-10 left-1/2 -translate-x-1/2
+    inline-flex gap-5 border rounded-3xl border-[#ffffff30]
+    backdrop-blur-md backdrop-brightness-75 p-5"
+  >
+    <div class="inline-flex rounded-2xl shadow-lg">
+      <button
+        class="transition-transform active:translate-y-1 flex size-12 content-center align-middle items-center border-[#80808030] border dark:bg-surface-900 rounded-l-2xl"
+        onclick={async () => {
+          const picked = await open({
+            multiple: true,
+            directory: false,
+            filters: [
+              {
+                name: "Images",
+                extensions: [
+                  "png",
+                  "jpg",
+                  "jpeg",
+                  "webp",
+                  "avif",
+                  "gif",
+                  "pdf",
+                  "svg",
+                ],
+              },
+            ],
+          });
+          if (!picked) return;
+          const pickedArr = Array.isArray(picked) ? picked : [picked];
+          const next = { ...imagesRecord };
+          for (const p of pickedArr) {
+            next[p] = next[p] ?? null;
+          }
+          imagesRecord = next;
+        }}><Plus class="size-5 mx-auto" /></button
+      >
 
-<button
-  onclick={async () => {
-    await invoke("convert_images", {
-      strPaths: Array.from(images),
-      imgFormat: imgFormat,
-      dpi,
-    });
-  }}>x</button
->
+      <button
+        class="transition-transform active:translate-y-1 flex border-[#80808030] border border-l-0 size-12 content-center align-middle items-center dark:bg-surface-900 rounded-r-2xl"
+        onclick={async () => {
+          imagesRecord = {};
+        }}><Trash class="size-5 mx-auto" /></button
+      >
+    </div>
+    <div class="inline-flex rounded-2xl shadow-lg">
+      <button
+        class="transition-transform active:rotate-180 active:scale-90 flex size-12 content-center align-middle items-center dark:bg-primary-700 bg-primary-200 rounded-2xl border-[#80808030] border"
+        onclick={async () => {
+          const next = { ...imagesRecord };
+          for (const image of Object.keys(imagesRecord)) {
+            next[image] = await invoke("convert_image", {
+              strPath: image,
+              imgFormat: imgFormat,
+              dpi,
+            });
+            console.log(next[image]);
+          }
+          imagesRecord = next;
+        }}><Repeat class="size-5 mx-auto" /></button
+      >
+    </div>
+    <div class="inline-flex rounded-2xl shadow-lg">
+      <div
+        class="flex border-[#80808030] border dark:bg-surface-900 rounded-2xl px-4 w-25 align-middle"
+      >
+        <select bind:value={imgFormat} class="select ring-0 focus:outline-0">
+          <option value="png">PNG</option>
+          <option value="jpg">JPG</option>
+          <option value="gif">GIF</option>
+          <option value="webp">WEBP</option>
+          <option value="avif">AVIF</option>
+        </select>
+      </div>
+    </div>
 
-<select bind:value={imgFormat}>
-  <option value="png">PNG</option>
-  <option value="jpg">JPG</option>
-  <option value="gif">GIF</option>
-  <option value="webp">WEBP</option>
-  <option value="avif">AVIF</option>
-  <option value="heic">HEIC</option>
-  <option value="tiff">TIFF</option>
-</select>
+    {#if Object.keys(imagesRecord).filter((path) => path.endsWith(".pdf") || path.endsWith(".svg")).length}
+      <div class="inline-flex rounded-2xl shadow-lg">
+        <div
+          class="flex border-[#80808030] border dark:bg-surface-900 rounded-2xl"
+        >
+          <input
+            placeholder="DPI"
+            class="focus:outline-0 px-4 align-middle w-30"
+            type="number"
+            bind:value={dpi}
+          />
+        </div>
+      </div>
+    {/if}
+  </div>
+</div>
 
-<input placeholder="DPI" type="number" bind:value={dpi} />
+<style>
+  @reference "tailwindcss";
+  .pathList > :first-child {
+    @apply rounded-t-2xl;
+  }
+  .pathList > :last-child {
+    @apply border-b rounded-b-2xl;
+  }
+</style>
