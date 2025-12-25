@@ -134,7 +134,11 @@
       <div
         class="flex border-[#80808030] border dark:bg-surface-900 rounded-2xl px-4 w-25 align-middle"
       >
-        <select bind:value={imgFormat} class="select ring-0 focus:outline-0">
+        <select bind:value={imgFormat} class="select ring-0 focus:outline-0" onchange={() => {
+          for (let k in imagesRecord) {
+            imagesRecord[k] = null
+          }
+        }}>
           <option value="png">PNG</option>
           <option value="jpg">JPG</option>
           <option value="gif">GIF</option>
