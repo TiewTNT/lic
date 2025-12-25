@@ -4,10 +4,10 @@
   import { X, Plus, Trash, Repeat } from "@lucide/svelte";
   import { flip } from "svelte/animate";
   import { slide } from "svelte/transition";
-  import { openPath } from '@tauri-apps/plugin-opener';
-  import { getCurrentWebview } from '@tauri-apps/api/webview';
-    import { onDestroy, onMount } from "svelte";
-    import type { UnlistenFn } from "@tauri-apps/api/event";
+  import { openPath } from "@tauri-apps/plugin-opener";
+  import { getCurrentWebview } from "@tauri-apps/api/webview";
+  import { onDestroy, onMount } from "svelte";
+  import type { UnlistenFn } from "@tauri-apps/api/event";
 
   let imagesRecord: Record<string, boolean | null> = $state({});
   $inspect(imagesRecord);
@@ -16,47 +16,36 @@
 
   let dpi = $state(300);
 
-  let inputFmtArr = [
-                  "png",
-                  "jpg",
-                  "jpeg",
-                  "webp",
-                  "avif",
-                  "gif",
-                  "pdf",
-                  "svg",
-                ]
+  let inputFmtArr = ["png", "jpg", "jpeg", "webp", "avif", "gif", "pdf", "svg"];
 
-  let unlisten: UnlistenFn
+  let unlisten: UnlistenFn;
   onMount(async () => {
-    unlisten = await getCurrentWebview().onDragDropEvent(event => {
-  const type  = event.payload.type;
-  if (type === 'drop') {
-    console.log('File paths:', event.payload.paths);
-    const next = { ...imagesRecord };
-    for (let path of event.payload.paths) {
-      if (inputFmtArr.includes(path.split('.').at(-1)?.toLowerCase() ?? "")) {
-        next[path] = next[path] ?? null;
-      } else {
-        console.error(path)
+    unlisten = await getCurrentWebview().onDragDropEvent((event) => {
+      const type = event.payload.type;
+      if (type === "drop") {
+        console.log("File paths:", event.payload.paths);
+        const next = { ...imagesRecord };
+        for (let path of event.payload.paths) {
+          if (
+            inputFmtArr.includes(path.split(".").at(-1)?.toLowerCase() ?? "")
+          ) {
+            next[path] = next[path] ?? null;
+          } else {
+            console.error(path);
+          }
+        }
+        imagesRecord = next;
+      } else if (type === "over") {
+        //console.log('Hovering files');
+      } else if (type === "leave") {
+        //console.log('Drag cancelled');
       }
-    }
-    imagesRecord = next
-  } else if (type === 'over') {
-    //console.log('Hovering files');
-  } else if (type === 'leave') {
-    //console.log('Drag cancelled');
-  }
-});
-
-
-  })
+    });
+  });
 
   onDestroy(() => {
-    unlisten()
-  })
-
-
+    unlisten();
+  });
 </script>
 
 <div class="p-10">
@@ -113,6 +102,10 @@
       return Array.from(extSet);
     })().join(", ")}
   </div>
+
+  {#if Object.keys(imagesRecord).length}
+    <div class="h-40"></div>
+  {/if}
 
   <div
     class="fixed bottom-10 left-1/2 -translate-x-1/2
