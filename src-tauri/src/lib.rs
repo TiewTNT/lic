@@ -6,6 +6,8 @@ use std::process::Command;
 use tauri::path::BaseDirectory;
 use tauri::{AppHandle, Manager};
 
+use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
+
 fn vips_path(app: &AppHandle) -> Result<std::path::PathBuf, String> {
     let subpath = if cfg!(target_os = "windows") {
         "resources/bin/windows/bin/vips.exe"
@@ -75,6 +77,16 @@ fn convert_image(app: AppHandle, str_path: String, img_format: String, dpi: Opti
                 let input_spec = format!("{}[page={},dpi={}]", str_path, page, dpi.unwrap_or(300));
 
                 if input_spec.as_str() != output.to_string_lossy().as_ref() {
+                    if output.exists() {
+                        if !app.dialog()
+                            .message(format!("{} already exists. Overwrite?", output.to_string_lossy().as_ref()))
+                            .title("File exists")
+                            .buttons(MessageDialogButtons::OkCancel)
+                            .blocking_show() {
+                                continue;
+                            };
+
+                    }
                     let status = Command::new(vips_path(&app).unwrap())
                         .args([
                             "copy",
@@ -110,6 +122,17 @@ fn convert_image(app: AppHandle, str_path: String, img_format: String, dpi: Opti
             };
 
             if str_path.as_str() != output.to_string_lossy().as_ref() {
+                if output.exists() {
+                    if !app.dialog()
+                        .message(format!("{} already exists. Overwrite?", output.to_string_lossy().as_ref()))
+                        .title("File exists")
+                        .buttons(MessageDialogButtons::OkCancel)
+                        .blocking_show()
+                    {
+                        return false;
+                    };
+                }
+
                 let status = Command::new(vips_path(&app).unwrap())
                     .args([
                         "copy",
@@ -129,21 +152,30 @@ fn convert_image(app: AppHandle, str_path: String, img_format: String, dpi: Opti
         }
         _ => {
             if str_path.as_str() != output_path.as_ref() {
+                if binding.exists() {
+                    if !app.dialog()
+                        .message(format!("{} already exists. Overwrite?", binding.to_string_lossy().as_ref()))
+                        .title("File exists")
+                        .buttons(MessageDialogButtons::OkCancel)
+                        .blocking_show()
+                    {
+                        return false;
+                    };
+                }
 
                 let status = Command::new(vips_path(&app).unwrap().to_string_lossy().to_string())
-                        .args(["copy", str_path.as_ref(), output_path.as_ref()])
-                        .status();
+                    .args(["copy", str_path.as_ref(), output_path.as_ref()])
+                    .status();
 
                 println!("{:?}", status);
                 match status {
                     Ok(s) if s.success() => return true,
                     _ => return false,
                 }
-
             }
         }
     };
-    return false
+    return false;
 }
 
 #[tauri::command]

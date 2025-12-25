@@ -4,6 +4,7 @@
   import { X, Plus, Trash, Repeat } from "@lucide/svelte";
   import { flip } from "svelte/animate";
   import { slide } from "svelte/transition";
+  import { openPath } from '@tauri-apps/plugin-opener';
 
   let imagesRecord: Record<string, boolean | null> = $state({});
   $inspect(imagesRecord);
@@ -30,16 +31,17 @@
         transition:slide={{ duration: 200 }}
         animate:flip={{ duration: 200 }}
       >
-        <span
+        <button
           class="text-white/50 truncate rtl text-lefttruncate overflow-hidden whitespace-nowrap text-left [direction:rtl]"
-        >
+        onclick={async () => await openPath(image.split(/\/|\\/).slice(0, -1).join("/"))}
+          >
           <span>
             {image.split(/\/|\\/).slice(0, -1).join("/") ?? ""}/
           </span>
           <strong class="dark:text-surface-contrast-900 text-surface-contrast-50">
             {image.split(/\/|\\/).at(-1) ?? ""}
           </strong>
-        </span>
+        </button>
         <button
           class="ml-auto"
           onclick={() => {
