@@ -1,12 +1,6 @@
 name: Build libvips for macOS (with PDF)
 
 on:
-  workflow_dispatch:
-    inputs:
-      vips_version:
-        description: "libvips version tag (e.g. 8.18.0)"
-        required: false
-        default: "8.18.0"
   push:
     paths:
       - ".github/workflows/build-libvips-macos.yml"
@@ -57,7 +51,7 @@ jobs:
           brew install cairo pango librsvg fontconfig freetype
 
           # "Everything-ish" extras (optional features that are commonly useful)
-          brew install libheif libarchive cgif imagequant openslide libraw
+          brew install libheif libarchive cgif libimagequant openslide libraw
 
           # PDF support (poppler-glib is required by libvips for pdfload)
           brew install poppler
