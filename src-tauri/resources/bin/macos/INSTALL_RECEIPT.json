@@ -1,0 +1,875 @@
+{
+  "homebrew_version": "5.0.6-39-gf9acaaf",
+  "used_options": [],
+  "unused_options": [],
+  "built_as_bottle": true,
+  "poured_from_bottle": true,
+  "loaded_from_api": true,
+  "installed_as_dependency": false,
+  "installed_on_request": true,
+  "changed_files": [
+    "lib/pkgconfig/vips-cpp.pc",
+    "lib/pkgconfig/vips.pc"
+  ],
+  "time": 1766812169,
+  "source_modified_time": 1765974265,
+  "compiler": "clang",
+  "aliases": [
+    "libvips"
+  ],
+  "runtime_dependencies": [
+    {
+      "full_name": "libpng",
+      "version": "1.6.53",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.6.53",
+      "declared_directly": true
+    },
+    {
+      "full_name": "freetype",
+      "version": "2.14.1",
+      "revision": 1,
+      "bottle_rebuild": 0,
+      "pkg_version": "2.14.1_1",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libunistring",
+      "version": "1.4.1",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.4.1",
+      "declared_directly": false
+    },
+    {
+      "full_name": "gettext",
+      "version": "0.26",
+      "revision": 1,
+      "bottle_rebuild": 0,
+      "pkg_version": "0.26_1",
+      "declared_directly": true
+    },
+    {
+      "full_name": "fontconfig",
+      "version": "2.17.1",
+      "revision": 0,
+      "bottle_rebuild": 1,
+      "pkg_version": "2.17.1",
+      "declared_directly": true
+    },
+    {
+      "full_name": "pcre2",
+      "version": "10.47",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "10.47",
+      "declared_directly": false
+    },
+    {
+      "full_name": "glib",
+      "version": "2.86.3",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "2.86.3",
+      "declared_directly": true
+    },
+    {
+      "full_name": "xorgproto",
+      "version": "2025.1",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "2025.1",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libxau",
+      "version": "1.0.12",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.0.12",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libxdmcp",
+      "version": "1.1.5",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.1.5",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libxcb",
+      "version": "1.17.0",
+      "revision": 0,
+      "bottle_rebuild": 1,
+      "pkg_version": "1.17.0",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libx11",
+      "version": "1.8.12",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.8.12",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libxext",
+      "version": "1.3.6",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.3.6",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libxrender",
+      "version": "0.9.12",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "0.9.12",
+      "declared_directly": false
+    },
+    {
+      "full_name": "lzo",
+      "version": "2.10",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "2.10",
+      "declared_directly": false
+    },
+    {
+      "full_name": "pixman",
+      "version": "0.46.4",
+      "revision": 0,
+      "bottle_rebuild": 1,
+      "pkg_version": "0.46.4",
+      "declared_directly": false
+    },
+    {
+      "full_name": "cairo",
+      "version": "1.18.4",
+      "revision": 0,
+      "bottle_rebuild": 1,
+      "pkg_version": "1.18.4",
+      "declared_directly": true
+    },
+    {
+      "full_name": "cfitsio",
+      "version": "4.6.3",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "4.6.3",
+      "declared_directly": true
+    },
+    {
+      "full_name": "cgif",
+      "version": "0.5.0",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "0.5.0",
+      "declared_directly": true
+    },
+    {
+      "full_name": "gmp",
+      "version": "6.3.0",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "6.3.0",
+      "declared_directly": false
+    },
+    {
+      "full_name": "isl",
+      "version": "0.27",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "0.27",
+      "declared_directly": false
+    },
+    {
+      "full_name": "mpfr",
+      "version": "4.2.2",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "4.2.2",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libmpc",
+      "version": "1.3.1",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.3.1",
+      "declared_directly": false
+    },
+    {
+      "full_name": "lz4",
+      "version": "1.10.0",
+      "revision": 0,
+      "bottle_rebuild": 1,
+      "pkg_version": "1.10.0",
+      "declared_directly": false
+    },
+    {
+      "full_name": "xz",
+      "version": "5.8.2",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "5.8.2",
+      "declared_directly": false
+    },
+    {
+      "full_name": "zstd",
+      "version": "1.5.7",
+      "revision": 0,
+      "bottle_rebuild": 1,
+      "pkg_version": "1.5.7",
+      "declared_directly": false
+    },
+    {
+      "full_name": "gcc",
+      "version": "15.2.0",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "15.2.0",
+      "declared_directly": false
+    },
+    {
+      "full_name": "hwloc",
+      "version": "2.12.2",
+      "revision": 1,
+      "bottle_rebuild": 0,
+      "pkg_version": "2.12.2_1",
+      "declared_directly": false
+    },
+    {
+      "full_name": "ca-certificates",
+      "version": "2025-12-02",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "2025-12-02",
+      "declared_directly": false
+    },
+    {
+      "full_name": "openssl@3",
+      "version": "3.6.0",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "3.6.0",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libevent",
+      "version": "2.1.12",
+      "revision": 1,
+      "bottle_rebuild": 0,
+      "pkg_version": "2.1.12_1",
+      "declared_directly": false
+    },
+    {
+      "full_name": "pmix",
+      "version": "5.0.9",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "5.0.9",
+      "declared_directly": false
+    },
+    {
+      "full_name": "open-mpi",
+      "version": "5.0.9",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "5.0.9",
+      "declared_directly": false
+    },
+    {
+      "full_name": "fftw",
+      "version": "3.3.10",
+      "revision": 2,
+      "bottle_rebuild": 1,
+      "pkg_version": "3.3.10_2",
+      "declared_directly": true
+    },
+    {
+      "full_name": "highway",
+      "version": "1.3.0",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.3.0",
+      "declared_directly": true
+    },
+    {
+      "full_name": "jpeg-turbo",
+      "version": "3.1.3",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "3.1.3",
+      "declared_directly": false
+    },
+    {
+      "full_name": "brotli",
+      "version": "1.2.0",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.2.0",
+      "declared_directly": false
+    },
+    {
+      "full_name": "giflib",
+      "version": "5.2.2",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "5.2.2",
+      "declared_directly": false
+    },
+    {
+      "full_name": "imath",
+      "version": "3.2.2",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "3.2.2",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libtiff",
+      "version": "4.7.1",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "4.7.1",
+      "declared_directly": true
+    },
+    {
+      "full_name": "little-cms2",
+      "version": "2.17",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "2.17",
+      "declared_directly": true
+    },
+    {
+      "full_name": "libdeflate",
+      "version": "1.25",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.25",
+      "declared_directly": false
+    },
+    {
+      "full_name": "openjph",
+      "version": "0.26.0",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "0.26.0",
+      "declared_directly": false
+    },
+    {
+      "full_name": "openexr",
+      "version": "3.4.4",
+      "revision": 1,
+      "bottle_rebuild": 0,
+      "pkg_version": "3.4.4_1",
+      "declared_directly": true
+    },
+    {
+      "full_name": "jpeg-xl",
+      "version": "0.11.1",
+      "revision": 3,
+      "bottle_rebuild": 0,
+      "pkg_version": "0.11.1_3",
+      "declared_directly": true
+    },
+    {
+      "full_name": "libvmaf",
+      "version": "3.0.0",
+      "revision": 0,
+      "bottle_rebuild": 1,
+      "pkg_version": "3.0.0",
+      "declared_directly": false
+    },
+    {
+      "full_name": "aom",
+      "version": "3.13.1",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "3.13.1",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libde265",
+      "version": "1.0.16",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.0.16",
+      "declared_directly": false
+    },
+    {
+      "full_name": "shared-mime-info",
+      "version": "2.4",
+      "revision": 1,
+      "bottle_rebuild": 0,
+      "pkg_version": "2.4_1",
+      "declared_directly": false
+    },
+    {
+      "full_name": "webp",
+      "version": "1.6.0",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.6.0",
+      "declared_directly": true
+    },
+    {
+      "full_name": "x265",
+      "version": "4.1",
+      "revision": 0,
+      "bottle_rebuild": 1,
+      "pkg_version": "4.1",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libheif",
+      "version": "1.20.2",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.20.2",
+      "declared_directly": true
+    },
+    {
+      "full_name": "liblqr",
+      "version": "0.4.3",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "0.4.3",
+      "declared_directly": false
+    },
+    {
+      "full_name": "jasper",
+      "version": "4.2.8",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "4.2.8",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libomp",
+      "version": "21.1.8",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "21.1.8",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libraw",
+      "version": "0.21.5",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "0.21.5",
+      "declared_directly": true
+    },
+    {
+      "full_name": "gdk-pixbuf",
+      "version": "2.44.4",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "2.44.4",
+      "declared_directly": false
+    },
+    {
+      "full_name": "graphite2",
+      "version": "1.3.14",
+      "revision": 0,
+      "bottle_rebuild": 2,
+      "pkg_version": "1.3.14",
+      "declared_directly": false
+    },
+    {
+      "full_name": "icu4c@78",
+      "version": "78.1",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "78.1",
+      "declared_directly": false
+    },
+    {
+      "full_name": "harfbuzz",
+      "version": "12.2.0",
+      "revision": 1,
+      "bottle_rebuild": 0,
+      "pkg_version": "12.2.0_1",
+      "declared_directly": false
+    },
+    {
+      "full_name": "fribidi",
+      "version": "1.0.16",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.0.16",
+      "declared_directly": false
+    },
+    {
+      "full_name": "pango",
+      "version": "1.57.0",
+      "revision": 1,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.57.0_1",
+      "declared_directly": true
+    },
+    {
+      "full_name": "librsvg",
+      "version": "2.61.3",
+      "revision": 1,
+      "bottle_rebuild": 0,
+      "pkg_version": "2.61.3_1",
+      "declared_directly": true
+    },
+    {
+      "full_name": "m4",
+      "version": "1.4.20",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.4.20",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libtool",
+      "version": "2.5.4",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "2.5.4",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libultrahdr",
+      "version": "1.4.0",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.4.0",
+      "declared_directly": true
+    },
+    {
+      "full_name": "libzip",
+      "version": "1.11.4",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.11.4",
+      "declared_directly": false
+    },
+    {
+      "full_name": "openjpeg",
+      "version": "2.5.4",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "2.5.4",
+      "declared_directly": true
+    },
+    {
+      "full_name": "imagemagick",
+      "version": "7.1.2-11",
+      "revision": 0,
+      "bottle_rebuild": 1,
+      "pkg_version": "7.1.2-11",
+      "declared_directly": true
+    },
+    {
+      "full_name": "libb2",
+      "version": "0.98.1",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "0.98.1",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libarchive",
+      "version": "3.8.4",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "3.8.4",
+      "declared_directly": true
+    },
+    {
+      "full_name": "libexif",
+      "version": "0.6.25",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "0.6.25",
+      "declared_directly": true
+    },
+    {
+      "full_name": "libimagequant",
+      "version": "4.4.1",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "4.4.1",
+      "declared_directly": true
+    },
+    {
+      "full_name": "libaec",
+      "version": "1.1.4",
+      "revision": 0,
+      "bottle_rebuild": 1,
+      "pkg_version": "1.1.4",
+      "declared_directly": false
+    },
+    {
+      "full_name": "pkgconf",
+      "version": "2.5.1",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "2.5.1",
+      "declared_directly": true
+    },
+    {
+      "full_name": "hdf5",
+      "version": "1.14.6",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.14.6",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libmatio",
+      "version": "1.5.29",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.5.29",
+      "declared_directly": true
+    },
+    {
+      "full_name": "mozjpeg",
+      "version": "4.1.5",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "4.1.5",
+      "declared_directly": true
+    },
+    {
+      "full_name": "uthash",
+      "version": "2.3.0",
+      "revision": 0,
+      "bottle_rebuild": 1,
+      "pkg_version": "2.3.0",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libdicom",
+      "version": "1.2.0",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.2.0",
+      "declared_directly": false
+    },
+    {
+      "full_name": "readline",
+      "version": "8.3.3",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "8.3.3",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libxml2",
+      "version": "2.15.1",
+      "revision": 1,
+      "bottle_rebuild": 1,
+      "pkg_version": "2.15.1_1",
+      "declared_directly": false
+    },
+    {
+      "full_name": "sqlite",
+      "version": "3.51.1",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "3.51.1",
+      "declared_directly": false
+    },
+    {
+      "full_name": "openslide",
+      "version": "4.0.0",
+      "revision": 1,
+      "bottle_rebuild": 0,
+      "pkg_version": "4.0.0_1",
+      "declared_directly": true
+    },
+    {
+      "full_name": "libidn2",
+      "version": "2.3.8",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "2.3.8",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libtasn1",
+      "version": "4.20.0",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "4.20.0",
+      "declared_directly": false
+    },
+    {
+      "full_name": "nettle",
+      "version": "3.10.2",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "3.10.2",
+      "declared_directly": false
+    },
+    {
+      "full_name": "p11-kit",
+      "version": "0.25.10",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "0.25.10",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libnghttp2",
+      "version": "1.68.0",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.68.0",
+      "declared_directly": false
+    },
+    {
+      "full_name": "unbound",
+      "version": "1.24.2",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.24.2",
+      "declared_directly": false
+    },
+    {
+      "full_name": "gnutls",
+      "version": "3.8.11",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "3.8.11",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libgpg-error",
+      "version": "1.58",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.58",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libassuan",
+      "version": "3.0.2",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "3.0.2",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libgcrypt",
+      "version": "1.11.2",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.11.2",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libksba",
+      "version": "1.6.7",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.6.7",
+      "declared_directly": false
+    },
+    {
+      "full_name": "libusb",
+      "version": "1.0.29",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.0.29",
+      "declared_directly": false
+    },
+    {
+      "full_name": "npth",
+      "version": "1.8",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.8",
+      "declared_directly": false
+    },
+    {
+      "full_name": "pinentry",
+      "version": "1.3.2",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "1.3.2",
+      "declared_directly": false
+    },
+    {
+      "full_name": "gnupg",
+      "version": "2.4.8",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "2.4.8",
+      "declared_directly": false
+    },
+    {
+      "full_name": "gpgme",
+      "version": "2.0.1",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "2.0.1",
+      "declared_directly": false
+    },
+    {
+      "full_name": "gpgmepp",
+      "version": "2.0.0",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "2.0.0",
+      "declared_directly": false
+    },
+    {
+      "full_name": "nspr",
+      "version": "4.38.2",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "4.38.2",
+      "declared_directly": false
+    },
+    {
+      "full_name": "nss",
+      "version": "3.119.1",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "3.119.1",
+      "declared_directly": false
+    },
+    {
+      "full_name": "poppler",
+      "version": "25.12.0",
+      "revision": 0,
+      "bottle_rebuild": 0,
+      "pkg_version": "25.12.0",
+      "declared_directly": true
+    }
+  ],
+  "source": {
+    "spec": "stable",
+    "versions": {
+      "stable": "8.18.0",
+      "head": null,
+      "version_scheme": 0,
+      "compatibility_version": null
+    },
+    "path": "/Users/tnttiew/Library/Caches/Homebrew/api/formula.jws.json",
+    "tap_git_head": null,
+    "tap": "homebrew/core"
+  },
+  "arch": "arm64",
+  "built_on": {
+    "os": "Macintosh",
+    "os_version": "macOS 15.7",
+    "cpu_family": "dunno",
+    "xcode": "26.1",
+    "clt": "26.1.0.0.1.1761104275",
+    "preferred_perl": "5.34"
+  }
+}
