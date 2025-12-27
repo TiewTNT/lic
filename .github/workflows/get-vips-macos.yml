@@ -1,22 +1,34 @@
-name: macOS build libvips
+name: Build libvips for macOS (with PDF)
 
 on:
-  push:
-  pull_request:
   workflow_dispatch:
+    inputs:
+      vips_version:
+        description: "libvips version tag (e.g. 8.18.0)"
+        required: false
+        default: "8.18.0"
+  push:
+    paths:
+      - ".github/workflows/build-libvips-macos.yml"
+  pull_request:
+    paths:
+      - ".github/workflows/build-libvips-macos.yml"
 
 jobs:
-  macos:
-    name: Build on ${{ matrix.os }}
+  build:
+    name: libvips 8.18.0 on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        # macos-14 is Apple Silicon on GitHub-hosted runners; macos-13 is Intel.
         os: [macos-14, macos-13]
 
+    env:
+      VIPS_VERSION: 8.18.0
+      PREFIX: /usr/local/libvips
+
     steps:
-      - name: Checkout
+      - name: Checkout (not strictly required, but nice to have)
         uses: actions/checkout@v4
 
       - name: Cache Homebrew downloads
@@ -24,104 +36,126 @@ jobs:
         with:
           path: |
             ~/Library/Caches/Homebrew
-          key: ${{ runner.os }}-${{ matrix.os }}-brew-${{ hashFiles('.github/workflows/macos-vips-build.yml') }}
+          key: ${{ runner.os }}-${{ matrix.os }}-brew-${{ hashFiles('.github/workflows/build-libvips-macos.yml') }}
           restore-keys: |
             ${{ runner.os }}-${{ matrix.os }}-brew-
 
-      - name: Install libvips (Homebrew)
+      - name: Install build deps (Homebrew)
         run: |
           set -euxo pipefail
+          export HOMEBREW_NO_AUTO_UPDATE=1
+
           brew update
-          # "vips" is the Homebrew formula name; it's also known as libvips
-          brew install vips
 
-          echo "== Installed versions =="
-          brew list --versions vips
-          # poppler is the PDF rendering lib used for PDF load support in libvips on many platforms
-          brew list --versions poppler || true
+          # Build tooling
+          brew install meson ninja pkgconf gettext gobject-introspection
 
-      # - name: Verify PDF support (poppler-glib + pdfload)
-      #   run: |
-      #     set -euxo pipefail
+          # Core deps / common loaders
+          brew install glib libpng jpeg-turbo libtiff webp openjpeg little-cms2 libexif
 
-      #     vips --version
+          # Text/SVG rendering (often expected)
+          brew install cairo pango librsvg fontconfig freetype
 
-      #     echo "== vips config (PDF lines) =="
-      #     vips --vips-config | grep -E 'PDF load' || true
+          # "Everything-ish" extras (optional features that are commonly useful)
+          brew install libheif libarchive cgif imagequant openslide libraw
 
-      #     echo "== operations containing 'pdf' (debug) =="
-      #     vips -l | grep -i pdf || true
+          # PDF support (poppler-glib is required by libvips for pdfload)
+          brew install poppler
 
-      #     # 1) Prefer the definitive config check
-      #     if vips --vips-config | grep -q 'PDF load with poppler-glib: yes'; then
-      #       echo "poppler-glib PDF support enabled ✅"
-      #     else
-      #       echo "poppler-glib not enabled ❌"
-      #       echo "Rebuilding vips from source (with poppler already installed)..."
-      #       brew install poppler
-      #       brew reinstall vips --build-from-source
-      #       vips --vips-config | grep -E 'PDF load' || true
-      #       vips --vips-config | grep -q 'PDF load with poppler-glib: yes'
-      #       echo "poppler-glib PDF support enabled after rebuild ✅"
-      #     fi
+          echo "== Tool versions =="
+          meson --version
+          ninja --version
+          pkgconf --version
+          brew list --versions poppler vips || true
 
-      #     # 2) Robust operation check: only compare the first column (operation name)
-      #     if vips -l | awk '{print $1}' | grep -qx 'pdfload' \
-      #       || vips -l | awk '{print $1}' | grep -qx 'pdfload_buffer'; then
-      #       echo "pdfload operation present ✅"
-      #     else
-      #       echo "pdfload operation missing ❌"
-      #       exit 1
-      #     fi
+          echo "== pkg-config sanity for poppler-glib =="
+          pkgconf --modversion poppler-glib
 
-
-      - name: Smoke test - render a PDF page to PNG
+      - name: Download libvips source
         run: |
           set -euxo pipefail
-          curl -L --retry 3 -o sample.pdf "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
-          # Render first page (page=0) to a PNG to prove PDF loading works
-          vips copy "sample.pdf[page=0]" out.png
+          # GitHub tag tarball (doesn't depend on release assets)
+          curl -L --retry 3 -o "vips-${VIPS_VERSION}.tar.gz" \
+            "https://github.com/libvips/libvips/archive/refs/tags/v${VIPS_VERSION}.tar.gz"
+          tar -xzf "vips-${VIPS_VERSION}.tar.gz"
+          mv "libvips-${VIPS_VERSION}" src
+
+      - name: Configure (Meson)
+        run: |
+          set -euxo pipefail
+          cd src
+
+          # Make sure pkg-config finds brewed .pc files
+          BREW_PREFIX="$(brew --prefix)"
+          export PKG_CONFIG_PATH="${BREW_PREFIX}/lib/pkgconfig:${BREW_PREFIX}/share/pkgconfig:${PKG_CONFIG_PATH:-}"
+
+          meson setup build \
+            --prefix="${PREFIX}" \
+            --libdir=lib \
+            --buildtype=release \
+            -Dintrospection=true
+
+      - name: Build
+        run: |
+          set -euxo pipefail
+          cd src
+          meson compile -C build
+
+      - name: Verify PDF support + smoke test
+        run: |
+          set -euxo pipefail
+          cd src
+
+          VIPS_BIN="./build/tools/vips/vips"
+
+          "${VIPS_BIN}" --version
+          "${VIPS_BIN}" --vips-config | grep -E 'PDF load|poppler' || true
+
+          # Hard requirement: poppler-glib must be enabled
+          "${VIPS_BIN}" --vips-config | grep -q 'PDF load with poppler-glib: yes'
+
+          # Smoke test: render a PDF page -> PNG
+          curl -L --retry 3 -o sample.pdf \
+            "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+          "${VIPS_BIN}" copy "sample.pdf[page=0]" out.png
           file out.png
 
-      - name: Build project (auto-detect)
+      - name: Install to staging (DESTDIR) + package tarball
         run: |
           set -euxo pipefail
+          cd src
 
-          # Node.js projects
-          if [ -f package.json ]; then
-            npm ci
-            if npm run | grep -qE '(^| )build($|:)'; then
-              npm run build
-            fi
-          fi
+          rm -rf stage
+          mkdir -p stage
 
-          # CMake projects
-          if [ -f CMakeLists.txt ]; then
-            cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-            cmake --build build --config Release
-          # Makefile projects
-          elif [ -f Makefile ] || [ -f makefile ]; then
-            make -j"$(sysctl -n hw.ncpu)"
-          fi
+          # Stage install into ./stage + PREFIX inside it
+          DESTDIR="$PWD/stage" meson install -C build
 
-      - name: Collect artifacts
-        run: |
-          set -euxo pipefail
-          mkdir -p artifacts
+          # Package result
+          OUTDIR="$GITHUB_WORKSPACE/artifacts"
+          mkdir -p "$OUTDIR"
 
-          vips --version > artifacts/vips-version.txt
-          brew info vips > artifacts/brew-info-vips.txt
-          vips -l > artifacts/vips-operations.txt
+          ART="libvips-${VIPS_VERSION}-${{ matrix.os }}.tar.gz"
+          (cd stage && tar -czf "$OUTDIR/$ART" .)
 
-          # include smoke-test output
-          [ -f out.png ] && cp out.png artifacts/ || true
+          # Checksums + manifest
+          shasum -a 256 "$OUTDIR/$ART" > "$OUTDIR/$ART.sha256"
 
-          # include common build outputs if they exist
-          [ -d dist ] && cp -R dist artifacts/ || true
-          [ -d build ] && cp -R build artifacts/ || true
+          # Helpful text file: how to use
+          cat > "$OUTDIR/USAGE-${{ matrix.os }}.txt" <<EOF
+          Extract anywhere, then set:
+            export VIPS_PREFIX="<extract_root>${PREFIX}"
+            export PATH="\$VIPS_PREFIX/bin:\$PATH"
+            export DYLD_LIBRARY_PATH="\$VIPS_PREFIX/lib:\$DYLD_LIBRARY_PATH"
+
+          Then test:
+            vips --version
+            vips --vips-config | grep -E 'PDF load|poppler'
+            vips copy "file.pdf[page=0]" out.png
+          EOF
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: macos-${{ matrix.os }}-build
+          name: libvips-8.18.0-${{ matrix.os }}
           path: artifacts
