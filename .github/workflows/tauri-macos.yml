@@ -27,6 +27,12 @@ jobs:
       - name: Build frontend
         run: npm run build
 
+      - name: vips permissions
+        run: chmod +x src-tauri/resources/bin/macos/bin/vips
+        
+      - name: Remove quarantine flag
+        run: xattr -dr com.apple.quarantine src-tauri/resources/bin/macos/bin/vips
+
       - name: Build Tauri app
         run: npm run tauri build
 

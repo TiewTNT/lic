@@ -1,36 +1,127 @@
-name: Build macOS libvips bundle
+name: macOS build libvips
 
 on:
   push:
-    branches: [ main ]
+  pull_request:
   workflow_dispatch:
 
 jobs:
-  build-macos-vips:
-    runs-on: macos-latest
+  macos:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # macos-14 is Apple Silicon on GitHub-hosted runners; macos-13 is Intel.
+        os: [macos-14, macos-13]
 
     steps:
-      - name: Checkout repo
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install libvips
-        run: brew install vips
+      - name: Cache Homebrew downloads
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Caches/Homebrew
+          key: ${{ runner.os }}-${{ matrix.os }}-brew-${{ hashFiles('.github/workflows/macos-vips-build.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.os }}-brew-
 
-      - name: Prepare output directory
-        run: mkdir -p out/bin out/lib
-
-      - name: Copy vips binary
+      - name: Install libvips (Homebrew)
         run: |
-          VIPS_PREFIX=$(brew --prefix vips)
-          cp "$VIPS_PREFIX/bin/vips" out/bin/
+          set -euxo pipefail
+          brew update
+          # "vips" is the Homebrew formula name; it's also known as libvips
+          brew install vips
 
-      - name: Copy dylibs
+          echo "== Installed versions =="
+          brew list --versions vips
+          # poppler is the PDF rendering lib used for PDF load support in libvips on many platforms
+          brew list --versions poppler || true
+
+      # - name: Verify PDF support (poppler-glib + pdfload)
+      #   run: |
+      #     set -euxo pipefail
+
+      #     vips --version
+
+      #     echo "== vips config (PDF lines) =="
+      #     vips --vips-config | grep -E 'PDF load' || true
+
+      #     echo "== operations containing 'pdf' (debug) =="
+      #     vips -l | grep -i pdf || true
+
+      #     # 1) Prefer the definitive config check
+      #     if vips --vips-config | grep -q 'PDF load with poppler-glib: yes'; then
+      #       echo "poppler-glib PDF support enabled ✅"
+      #     else
+      #       echo "poppler-glib not enabled ❌"
+      #       echo "Rebuilding vips from source (with poppler already installed)..."
+      #       brew install poppler
+      #       brew reinstall vips --build-from-source
+      #       vips --vips-config | grep -E 'PDF load' || true
+      #       vips --vips-config | grep -q 'PDF load with poppler-glib: yes'
+      #       echo "poppler-glib PDF support enabled after rebuild ✅"
+      #     fi
+
+      #     # 2) Robust operation check: only compare the first column (operation name)
+      #     if vips -l | awk '{print $1}' | grep -qx 'pdfload' \
+      #       || vips -l | awk '{print $1}' | grep -qx 'pdfload_buffer'; then
+      #       echo "pdfload operation present ✅"
+      #     else
+      #       echo "pdfload operation missing ❌"
+      #       exit 1
+      #     fi
+
+
+      - name: Smoke test - render a PDF page to PNG
         run: |
-          VIPS_PREFIX=$(brew --prefix vips)
-          cp "$VIPS_PREFIX/lib/"*.dylib out/lib/
+          set -euxo pipefail
+          curl -L --retry 3 -o sample.pdf "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+          # Render first page (page=0) to a PNG to prove PDF loading works
+          vips copy "sample.pdf[page=0]" out.png
+          file out.png
 
-      - name: Upload libvips bundle
+      - name: Build project (auto-detect)
+        run: |
+          set -euxo pipefail
+
+          # Node.js projects
+          if [ -f package.json ]; then
+            npm ci
+            if npm run | grep -qE '(^| )build($|:)'; then
+              npm run build
+            fi
+          fi
+
+          # CMake projects
+          if [ -f CMakeLists.txt ]; then
+            cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+            cmake --build build --config Release
+          # Makefile projects
+          elif [ -f Makefile ] || [ -f makefile ]; then
+            make -j"$(sysctl -n hw.ncpu)"
+          fi
+
+      - name: Collect artifacts
+        run: |
+          set -euxo pipefail
+          mkdir -p artifacts
+
+          vips --version > artifacts/vips-version.txt
+          brew info vips > artifacts/brew-info-vips.txt
+          vips -l > artifacts/vips-operations.txt
+
+          # include smoke-test output
+          [ -f out.png ] && cp out.png artifacts/ || true
+
+          # include common build outputs if they exist
+          [ -d dist ] && cp -R dist artifacts/ || true
+          [ -d build ] && cp -R build artifacts/ || true
+
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: libvips-macos
-          path: out
+          name: macos-${{ matrix.os }}-build
+          path: artifacts
